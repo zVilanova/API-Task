@@ -1,0 +1,6 @@
+@APITask_HostAddress = http://localhost:5160
+
+GET {{APITask_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
