@@ -1,6 +1,7 @@
 ﻿using APITask.Data;
 using APITask.DTOs;
 using APITask.Models;
+using APITask.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,11 +32,19 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetTasksAsync()
+    public async Task<IActionResult> GetTasksAsync([FromQuery] TaskItemPriority? priority, [FromQuery] TaskItemStatus? status)
     {
+        var query = _context.Tasks.AsNoTracking().AsQueryable();
+
+        if (priority.HasValue)
+            query = query.Where(t => t.Priority == priority.Value);
+
+        if (status.HasValue)
+            query = query.Where(t => t.Status == status.Value);
+
         // AsNoTracking() — não rastreia mudanças, melhor performance em consultas GET
         // ToListAsync() — executa o SELECT e armazena em lista de forma assíncrona
-        var tasks = await _context.Tasks.AsNoTracking().ToListAsync();
+        var tasks = await query.ToListAsync();
         var response = tasks.Select(task => ToResponseDto(task));
         return Ok(response);
     }
@@ -86,10 +95,20 @@ public class TasksController : ControllerBase
             task.Description = updateTaskDto.Description;
 
         if (updateTaskDto.Status is not null)
+        {
+            if (!Enum.IsDefined(typeof(TaskItemStatus), updateTaskDto.Status.Value)) //Verifica se o parametro é valido
+                return BadRequest("Status inválido...");
+
             task.Status = updateTaskDto.Status.Value;
+        }
 
         if (updateTaskDto.Priority is not null)
+        {
+            if (!Enum.IsDefined(typeof(TaskItemPriority), updateTaskDto.Priority.Value)) //Verifica se o parametro é valido
+                return BadRequest("Status inválido...");
+
             task.Priority = updateTaskDto.Priority.Value;
+        }
 
         _context.Tasks.Update(task);
         await _context.SaveChangesAsync();
