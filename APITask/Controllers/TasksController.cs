@@ -105,7 +105,7 @@ public class TasksController : ControllerBase
         if (updateTaskDto.Priority is not null)
         {
             if (!Enum.IsDefined(typeof(TaskItemPriority), updateTaskDto.Priority.Value)) //Verifica se o parametro é valido
-                return BadRequest("Status inválido...");
+                return BadRequest("Prioridade inválida...");
 
             task.Priority = updateTaskDto.Priority.Value;
         }
