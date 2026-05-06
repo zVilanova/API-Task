@@ -100,8 +100,8 @@ APITask é um sistema de gerenciamento de tarefas construído do zero, com foco 
 - Ação: GET /api/tasks → filtra tarefas Pending com prioridade Low ou Medium criadas há mais de 3 dias → PATCH /api/tasks/{id} atualizando para High → notificação por e-mail
 <img width="729" height="359" alt="image" src="https://github.com/user-attachments/assets/82aed7de-5c7e-4e99-8656-f99468e635a3" />
 
-### Fluxos do Copilot Studio (internos)
-Fluxos acionados pelo chatbot via Copilot Studio:
+### Fluxos do Power Automate integrados com Copilot Studio (utilizados internamente)
+Cada um dos fluxos abaixo é responsável por uma ação após ser acionado pelo chatbot via Copilot Studio
 
 | Fluxo          | Método     | Endpoint          |
 |----------------|------------|-------------------|
