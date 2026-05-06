@@ -16,7 +16,7 @@ APITask é um sistema de gerenciamento de tarefas construído do zero, com foco 
 - Um chatbot no Copilot Studio que integra os fluxos e permite gerenciar tarefas via chat
 
 ### Arquitetura
-<img width="2978" height="230" alt="mermaid-diagram (1)" src="https://github.com/user-attachments/assets/d10e37a5-6478-4ebc-9b64-eb84bc3f6ebf" />
+<img width="2900" height="230" alt="mermaid-diagram (1)" src="https://github.com/user-attachments/assets/d10e37a5-6478-4ebc-9b64-eb84bc3f6ebf" />
 
 - O usuário interage com o TaskBot no Copilot Studio via chat
 - O Copilot Studio aciona um fluxo no Power Automate conforme o tópico identificado
@@ -90,11 +90,15 @@ APITask é um sistema de gerenciamento de tarefas construído do zero, com foco 
 - Trigger: Recorrência — todo dia às 9h (Horário de Brasília)
 - Ação: GET /api/tasks → filtra tarefas Pending → envia e-mail
 - Destaque: Tarefas de prioridade High são exibidas em vermelho
+<img width="467" height="284" alt="image" src="https://github.com/user-attachments/assets/85170eb0-5aa4-442d-9023-809e68b74bfb" />
+
+
 
 ### Flow B — Escalação automática de prioridade
 - Tipo: Agendado (diário)
 - Trigger: Recorrência — todo dia às 9h
 - Ação: GET /api/tasks → filtra tarefas Pending com prioridade Low ou Medium criadas há mais de 3 dias → PATCH /api/tasks/{id} atualizando para High → notificação por e-mail
+<img width="729" height="359" alt="image" src="https://github.com/user-attachments/assets/82aed7de-5c7e-4e99-8656-f99468e635a3" />
 
 ### Fluxos do Copilot Studio (internos)
 Fluxos acionados pelo chatbot via Copilot Studio:
