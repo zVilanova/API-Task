@@ -1,6 +1,41 @@
 @APITask_HostAddress = http://localhost:5160
+@TaskId = 1
 
-GET {{APITask_HostAddress}}/weatherforecast/
+### Listar todas as tarefas
+GET {{APITask_HostAddress}}/api/tasks
 Accept: application/json
 
-###
+### Filtrar por status
+GET {{APITask_HostAddress}}/api/tasks?status=Pending
+Accept: application/json
+
+### Filtrar por prioridade
+GET {{APITask_HostAddress}}/api/tasks?priority=High
+Accept: application/json
+
+### Buscar tarefa por ID
+GET {{APITask_HostAddress}}/api/tasks/{{TaskId}}
+Accept: application/json
+
+### Criar tarefa
+POST {{APITask_HostAddress}}/api/tasks
+Content-Type: application/json
+
+{
+  "title": "Revisar documentação",
+  "description": "Atualizar exemplos do arquivo .http",
+  "priority": 2
+}
+
+### Atualizar tarefa parcialmente
+PATCH {{APITask_HostAddress}}/api/tasks/{{TaskId}}
+Content-Type: application/json
+
+{
+  "status": 1,
+  "priority": 2
+}
+
+### Deletar tarefa
+DELETE {{APITask_HostAddress}}/api/tasks/{{TaskId}}
+Accept: application/json
