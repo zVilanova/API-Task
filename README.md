@@ -134,13 +134,13 @@ O TaskBot é um agente conversacional que permite gerenciar tarefas via chat em 
 
 #### Clonar o repositório
 ```bash
-git clone https://github.com/zVilanova/APITask.git
-cd APITask/APITask
+git clone https://github.com/zVilanova/API-Task.git
+cd API-Task/APITask
 dotnet restore
 ```
 
 #### Configuração da connection string
-No appsettings.json (desenvolvimento local):
+No appsettings.Development.json (desenvolvimento local):
 ```json
 {
   "ConnectionStrings": {
@@ -148,17 +148,22 @@ No appsettings.json (desenvolvimento local):
   }
 }
 ```
-Em produção, a connection string é configurada diretamente nas variáveis de ambiente do Azure App Service - sem expor credenciais no repositório
+Em produção, a connection string é configurada diretamente nas variáveis de ambiente do Azure App Service - sem expor credenciais no repositório (O nome da connection string deve ser exatamente "DefaultConnection", pois é esse nome que a API busca em tempo de execução)
 
 #### Migrations
+Caso não tenha EF CLI instalado:
 ```bash
-dotnet ef database update (caso não tenha EF CLI instalado: dotnet tool install --global dotnet-ef)
+dotnet tool install --global dotnet-ef
+```
+Aplique a migration
+```bash
+dotnet ef database update
 ```
 #### Executar aplicação
 ```bash
 dotnet run
 ```
-A API estará disponível em https://localhost:7110, você pode testar os endpoints utilizando Postman
+A API estará disponível em `https://localhost:7110`, você pode testar os endpoints utilizando Postman ou o arquivo `APITask.http`
 
 #### Publicar no Azure
 Via Visual Studio:
