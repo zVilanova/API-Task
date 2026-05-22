@@ -1,5 +1,5 @@
-@APITask_HostAddress = http://localhost:7110
-@TaskId = 1
+@APITask_HostAddress = https://localhost:7110
+@TaskId = 8
 
 ### Listar todas as tarefas
 GET {{APITask_HostAddress}}/api/tasks
