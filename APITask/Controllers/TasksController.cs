@@ -1,9 +1,7 @@
-﻿using APITask.Data;
-using APITask.DTOs;
-using APITask.Models;
+﻿using APITask.DTOs;
 using APITask.Models.Enums;
+using APITask.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace APITask.Controllers;
 
@@ -11,53 +9,29 @@ namespace APITask.Controllers;
 [Route("api/[controller]")]
 public class TasksController : ControllerBase
 {
-    private readonly AppDbContext _context;
-    public TasksController(AppDbContext context)
+    private readonly ITaskService _taskService;
+    public TasksController(ITaskService taskService)
     {
-        _context = context;
-    }
-
-    // Convertendo entidade <TaskItem> para DTO de resposta
-    private TaskResponseDto ToResponseDto(TaskItem task)
-    {
-        return new TaskResponseDto
-        {
-            TaskItemId = task.TaskItemId,
-            Title = task.Title,
-            Description = task.Description,
-            Status = task.Status.ToString(),
-            Priority = task.Priority.ToString(),
-            CreatedAt = task.CreatedAt.ToString("o")
-        };
+        _taskService = taskService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetTasksAsync([FromQuery] TaskItemPriority? priority, [FromQuery] TaskItemStatus? status)
     {
-        var query = _context.Tasks.AsNoTracking().AsQueryable();
+        var tasks = await _taskService.GetTasksAsync(priority, status);
 
-        if (priority.HasValue)
-            query = query.Where(t => t.Priority == priority.Value);
-
-        if (status.HasValue)
-            query = query.Where(t => t.Status == status.Value);
-
-        // AsNoTracking() — não rastreia mudanças, melhor performance em consultas GET
-        // ToListAsync() — executa o SELECT e armazena em lista de forma assíncrona
-        var tasks = await query.ToListAsync();
-        var response = tasks.Select(task => ToResponseDto(task));
-        return Ok(response);
+        return Ok(tasks);
     }
 
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetByIdTaskAsync(int id)
+    public async Task<IActionResult> GetTaskByIdAsync(int id)
     {
-        var task = await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(taskId => taskId.TaskItemId == id);
+        var task = await _taskService.GetTaskByIdAsync(id);
 
         if (task is null)
             return NotFound("Task não encontrada...");
        
-        return Ok(ToResponseDto(task));
+        return Ok(task);
     }
 
     [HttpPost]
@@ -66,68 +40,45 @@ public class TasksController : ControllerBase
         if (createTaskDto is null)
             return BadRequest("Informações inválidas...");
 
-        // Convertendo DTO para entidade <TaskItem>
-        var taskItem = new TaskItem
-        {
-            Title = createTaskDto.Title,
-            Description = createTaskDto.Description,
-            Priority = createTaskDto.Priority.GetValueOrDefault(),
-        };
+        var task = await _taskService.CreateTaskAsync(createTaskDto);
 
-        _context.Tasks.Add(taskItem);
-        await _context.SaveChangesAsync();
-
-        return StatusCode(201, ToResponseDto(taskItem));
+        return StatusCode(201, task);
     }
 
     [HttpPatch("{id:int}")]
     public async Task<IActionResult> PatchTaskAsync(int id, [FromBody] UpdateTaskDto updateTaskDto)
     {
-        var task = await _context.Tasks.FirstOrDefaultAsync(taskId => taskId.TaskItemId == id);
-
-        if (task is null)
-            return NotFound("Task não encontrada...");
-
-        if (updateTaskDto.Title is not null)
-            task.Title = updateTaskDto.Title;
-
-        if (updateTaskDto.Description is not null)
-            task.Description = updateTaskDto.Description;
+        if (updateTaskDto is null)
+            return BadRequest("Informações inválidas...");
 
         if (updateTaskDto.Status is not null)
         {
-            if (!Enum.IsDefined(typeof(TaskItemStatus), updateTaskDto.Status.Value)) //Verifica se o parametro é valido
+            if (!Enum.IsDefined(typeof(TaskItemStatus), updateTaskDto.Status.Value))
                 return BadRequest("Status inválido...");
-
-            task.Status = updateTaskDto.Status.Value;
         }
 
         if (updateTaskDto.Priority is not null)
         {
-            if (!Enum.IsDefined(typeof(TaskItemPriority), updateTaskDto.Priority.Value)) //Verifica se o parametro é valido
+            if (!Enum.IsDefined(typeof(TaskItemPriority), updateTaskDto.Priority.Value))
                 return BadRequest("Prioridade inválida...");
-
-            task.Priority = updateTaskDto.Priority.Value;
         }
 
-        _context.Tasks.Update(task);
-        await _context.SaveChangesAsync();
+        var task = await _taskService.UpdateTaskAsync(id, updateTaskDto);
 
-        return Ok(ToResponseDto(task));
+        if (task is null)
+            return NotFound("Task não encontrada...");
+
+        return Ok(task);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteByIdTaskAsync(int id)
     {
-        var taskItem = await _context.Tasks.FirstOrDefaultAsync(task => task.TaskItemId == id);
+        var taskDeleted = await _taskService.DeleteTaskAsync(id);
 
-        if (taskItem is null)
+        if (taskDeleted is false)
             return NotFound("Task não encontrada...");
-
-        _context.Tasks.Remove(taskItem);
-        await _context.SaveChangesAsync(); 
 
         return NoContent();
     }
-
 }
