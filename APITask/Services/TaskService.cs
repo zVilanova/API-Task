@@ -1,16 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-using APITask.Services.Interfaces;
-using APITask.Models.Enums;
-using APITask.Models;
-using APITask.Data;
+﻿using APITask.Data;
 using APITask.DTOs;
-using Microsoft.AspNetCore.Http.HttpResults;
-
+using APITask.Models;
+using APITask.Models.Enums;
+using APITask.Results;
+using APITask.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace APITask.Services;
 
 public class TaskService : ITaskService
-{   
+{
     private readonly AppDbContext _context;
     public TaskService(AppDbContext context)
     {
@@ -30,33 +29,34 @@ public class TaskService : ITaskService
             CreatedAt = task.CreatedAt.ToString("o")
         };
     }
-    
-    public async Task<IEnumerable<TaskResponseDto>> GetTasksAsync(TaskItemPriority? priority, TaskItemStatus? status)
+
+    public async Task<ServiceResult<IEnumerable<TaskResponseDto>>> GetTasksAsync(TaskItemPriority? priority, TaskItemStatus? status)
     {
         var query = _context.Tasks.AsNoTracking().AsQueryable(); // AsNoTracking() — não rastreia mudanças, melhor performance em consultas GET
 
         if (priority.HasValue)
             query = query.Where(t => t.Priority == priority.Value);
-        
+
         if (status.HasValue)
             query = query.Where(t => t.Status == status.Value);
 
         var tasks = await query.ToListAsync(); // ToListAsync() — executa o SELECT e armazena em lista de forma assíncrona   
 
-        return tasks.Select(t => ToResponseDto(t));
+        var response = tasks.Select(t => ToResponseDto(t));
+        return ServiceResult<IEnumerable<TaskResponseDto>>.Success(response);
     }
 
-    public async Task<TaskResponseDto?> GetTaskByIdAsync(int id)
+    public async Task<ServiceResult<TaskResponseDto>> GetTaskByIdAsync(int id)
     {
         var task = await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(t => t.TaskItemId == id);
 
         if (task is null)
-            return null;
+            return ServiceResult<TaskResponseDto>.NotFound("Task não encontrada...");
 
-        return ToResponseDto(task);
+        return ServiceResult<TaskResponseDto>.Success(ToResponseDto(task));
     }
 
-    public async Task<TaskResponseDto> CreateTaskAsync(CreateTaskDto createTaskDto)
+    public async Task<ServiceResult<TaskResponseDto>> CreateTaskAsync(CreateTaskDto createTaskDto)
     {
         var taskItem = new TaskItem
         {
@@ -68,15 +68,15 @@ public class TaskService : ITaskService
         _context.Tasks.Add(taskItem);
         await _context.SaveChangesAsync();
 
-        return ToResponseDto(taskItem);
+        return ServiceResult<TaskResponseDto>.Success(ToResponseDto(taskItem));
     }
 
-    public async Task<TaskResponseDto?> UpdateTaskAsync(int id, UpdateTaskDto updateTaskDto)
+    public async Task<ServiceResult<TaskResponseDto>> UpdateTaskAsync(int id, UpdateTaskDto updateTaskDto)
     {
         var task = await _context.Tasks.FirstOrDefaultAsync(t => t.TaskItemId == id);
-        
+
         if (task is null)
-            return null;
+            return ServiceResult<TaskResponseDto>.NotFound("Task não encontrada...");
 
         if (updateTaskDto.Title is not null)
             task.Title = updateTaskDto.Title;
@@ -85,26 +85,36 @@ public class TaskService : ITaskService
             task.Description = updateTaskDto.Description;
 
         if (updateTaskDto.Status is not null)
+        {
+            if (!Enum.IsDefined(typeof(TaskItemStatus), updateTaskDto.Status.Value))
+                return ServiceResult<TaskResponseDto>.ValidationError("Status inválido...");
+
             task.Status = updateTaskDto.Status.Value;
+        }
 
         if (updateTaskDto.Priority is not null)
+        {
+            if (!Enum.IsDefined(typeof(TaskItemPriority), updateTaskDto.Priority.Value))
+                return ServiceResult<TaskResponseDto>.ValidationError("Prioridade inválida...");
+
             task.Priority = updateTaskDto.Priority.Value;
+        }
 
         await _context.SaveChangesAsync();
 
-        return ToResponseDto(task);
+        return ServiceResult<TaskResponseDto>.Success(ToResponseDto(task));
     }
 
-    public async Task<bool> DeleteTaskAsync(int id)
-    {   
+    public async Task<ServiceResult<bool>> DeleteTaskAsync(int id)
+    {
         var task = await _context.Tasks.FirstOrDefaultAsync(t => t.TaskItemId == id);
 
         if (task is null)
-            return false;
+            return ServiceResult<bool>.NotFound("Task não encontrada...");
 
         _context.Tasks.Remove(task);
         await _context.SaveChangesAsync();
 
-        return true;
+        return ServiceResult<bool>.Success(true);
     }
 }

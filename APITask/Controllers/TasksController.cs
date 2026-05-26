@@ -1,5 +1,6 @@
 ﻿using APITask.DTOs;
 using APITask.Models.Enums;
+using APITask.Results;
 using APITask.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,20 +19,20 @@ public class TasksController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetTasksAsync([FromQuery] TaskItemPriority? priority, [FromQuery] TaskItemStatus? status)
     {
-        var tasks = await _taskService.GetTasksAsync(priority, status);
+        var result = await _taskService.GetTasksAsync(priority, status);
 
-        return Ok(tasks);
+        return Ok(result.Data);
     }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetTaskByIdAsync(int id)
     {
-        var task = await _taskService.GetTaskByIdAsync(id);
+        var result = await _taskService.GetTaskByIdAsync(id);
 
-        if (task is null)
-            return NotFound("Task não encontrada...");
+        if (result.Status == ServiceResultStatus.NotFound)
+            return NotFound(result.Message);
        
-        return Ok(task);
+        return Ok(result.Data);
     }
 
     [HttpPost]
@@ -40,9 +41,9 @@ public class TasksController : ControllerBase
         if (createTaskDto is null)
             return BadRequest("Informações inválidas...");
 
-        var task = await _taskService.CreateTaskAsync(createTaskDto);
+        var result = await _taskService.CreateTaskAsync(createTaskDto);
 
-        return StatusCode(201, task);
+        return StatusCode(201, result.Data);
     }
 
     [HttpPatch("{id:int}")]
@@ -51,33 +52,24 @@ public class TasksController : ControllerBase
         if (updateTaskDto is null)
             return BadRequest("Informações inválidas...");
 
-        if (updateTaskDto.Status is not null)
-        {
-            if (!Enum.IsDefined(typeof(TaskItemStatus), updateTaskDto.Status.Value))
-                return BadRequest("Status inválido...");
-        }
+        var result = await _taskService.UpdateTaskAsync(id, updateTaskDto);
 
-        if (updateTaskDto.Priority is not null)
-        {
-            if (!Enum.IsDefined(typeof(TaskItemPriority), updateTaskDto.Priority.Value))
-                return BadRequest("Prioridade inválida...");
-        }
+        if (result.Status == ServiceResultStatus.NotFound)
+            return NotFound(result.Message);
 
-        var task = await _taskService.UpdateTaskAsync(id, updateTaskDto);
+        if (result.Status == ServiceResultStatus.ValidationError)
+            return BadRequest(result.Message);
 
-        if (task is null)
-            return NotFound("Task não encontrada...");
-
-        return Ok(task);
+        return Ok(result.Data);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteByIdTaskAsync(int id)
     {
-        var taskDeleted = await _taskService.DeleteTaskAsync(id);
+        var result = await _taskService.DeleteTaskAsync(id);
 
-        if (taskDeleted is false)
-            return NotFound("Task não encontrada...");
+        if (result.Status == ServiceResultStatus.NotFound)
+            return NotFound(result.Message);
 
         return NoContent();
     }
