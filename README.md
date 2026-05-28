@@ -83,6 +83,7 @@ APITask é um sistema de gerenciamento de tarefas construído do zero, com foco 
 |   1   | Medium (Média)    |
 |   2   | High (Alta)       |
 
+---
 ##  Fluxos no Power Automate
 
 ### Flow A — Relatório diário de tarefas
@@ -92,13 +93,13 @@ APITask é um sistema de gerenciamento de tarefas construído do zero, com foco 
 - Destaque: Tarefas de prioridade High são exibidas em vermelho
 <img width="467" height="284" alt="image" src="https://github.com/user-attachments/assets/85170eb0-5aa4-442d-9023-809e68b74bfb" />
 
-
-
 ### Flow B — Escalação automática de prioridade
 - Tipo: Agendado (diário)
 - Trigger: Recorrência — todo dia às 9h
 - Ação: GET /api/tasks → filtra tarefas Pending com prioridade Low ou Medium criadas há mais de 3 dias → PATCH /api/tasks/{id} atualizando para High → notificação por e-mail
 <img width="729" height="359" alt="image" src="https://github.com/user-attachments/assets/82aed7de-5c7e-4e99-8656-f99468e635a3" />
+
+---
 
 ### Fluxos do Power Automate integrados com Copilot Studio (utilizados internamente)
 Cada um dos fluxos abaixo é responsável por uma ação após ser acionado pelo chatbot via Copilot Studio
@@ -111,6 +112,11 @@ Cada um dos fluxos abaixo é responsável por uma ação após ser acionado pelo
 |   PatchTask    | `PATCH`    | /api/tasks/{id}   |
 |   DeleteTask   | `DELETE`   | /api/tasks/{id}   |
 
+### Exemplo de fluxo (GetAllTasks) 
+
+<img width="599" height="842" alt="power_automate" src="https://github.com/user-attachments/assets/7387bfb6-f595-429c-864b-88a356981cad" />
+
+---
 ## Chatbot - TaskBot (Copilot Studio)
 O TaskBot é um agente conversacional que permite gerenciar tarefas via chat em linguagem natural
 
@@ -126,6 +132,12 @@ O TaskBot é um agente conversacional que permite gerenciar tarefas via chat em 
 
 [![Demo](https://img.youtube.com/vi/D6BxqQSE-Lg/0.jpg)](https://www.youtube.com/watch?v=D6BxqQSE-Lg)
 
+### Exemplo de Tópico interno
+
+<img width="270" height="670" alt="a" src="https://github.com/user-attachments/assets/59841e15-0fea-4722-9118-f4daba5604ef" />
+<img width="270" height="670" alt="b" src="https://github.com/user-attachments/assets/9e129fbc-8130-4488-b550-347b0d65b285" />
+
+---
 ## Rodando localmente
 ### Pré-requisitos
 - .NET 10 SDK
