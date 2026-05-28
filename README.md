@@ -132,7 +132,7 @@ O TaskBot é um agente conversacional que permite gerenciar tarefas via chat em 
 
 [![Demo](https://img.youtube.com/vi/D6BxqQSE-Lg/0.jpg)](https://www.youtube.com/watch?v=D6BxqQSE-Lg)
 
-### Exemplo de Tópico interno
+### Exemplo de Tópico no Copilot Studio
 
 <img width="270" height="670" alt="a" src="https://github.com/user-attachments/assets/59841e15-0fea-4722-9118-f4daba5604ef" />
 <img width="270" height="670" alt="b" src="https://github.com/user-attachments/assets/9e129fbc-8130-4488-b550-347b0d65b285" />
@@ -187,6 +187,10 @@ Via Visual Studio:
 O Visual Studio compila em modo Release e publica automaticamente. As migrations são aplicadas no banco Azure durante o deploy.
 
 ## Próximas melhorias
-- [ ] Autenticação e autorização com JWT
-- [ ] Testes unitários nos Controllers
+- [x] Service Layer
+- [x] Padronização das respostas da API
+- [ ] Tratamento global de exceções
+- [ ] Testes automatizados
 - [ ] Documentação interativa com Scalar
+- [ ] Autenticação e autorização com JWT ou Entra ID
+- [ ] Logging estruturado
