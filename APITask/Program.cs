@@ -1,4 +1,5 @@
 using APITask.Data;
+using APITask.Extensions;
 using APITask.Services;
 using APITask.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ITaskService, TaskService>();
 
 var app = builder.Build();
+
+app.ConfigureExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
