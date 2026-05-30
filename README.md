@@ -1,4 +1,4 @@
-# TaskAPI - Gerenciador de Tarefas com Chatbot 
+# TaskAPI - Gerenciador de Tarefas com Chatbot (V2)
 ![.NET](https://img.shields.io/badge/.NET_10-512BD4?style=flat&logo=dotnet&logoColor=white)
 ![Azure](https://img.shields.io/badge/Azure-0078D4?style=flat&logo=microsoftazure&logoColor=white)
 ![Power Automate](https://img.shields.io/badge/Power_Automate-0066FF?style=flat&logo=powerautomate&logoColor=white)
@@ -15,6 +15,19 @@ APITask é um sistema de gerenciamento de tarefas construído do zero, com foco 
 - Fluxos no Power Automate que consomem a API via HTTP
 - Um chatbot no Copilot Studio que integra os fluxos e permite gerenciar tarefas via chat
 
+### Evolução da V2
+Na V2, o foco foi evoluir a estrutura interna da API sem alterar o contrato consumido pelo Power Automate e pelo Copilot Studio.
+
+Principais melhorias implementadas:
+
+- Service Layer para separar a lógica de aplicação dos controllers
+- Interface `ITaskService` para definir o contrato da camada de serviço
+- Classe concreta `TaskService` responsável pelas operações de tarefa
+- Padronização dos resultados internos com `ServiceResult<T>`
+- Tratamento global de exceções com resposta JSON padronizada
+- Testes automatizados da `TaskService` com xUnit e EF Core InMemory
+- Documentação interativa com Scalar em ambiente de desenvolvimento
+
 ### Arquitetura
 <img width="2900" height="230" alt="mermaid-diagram (1)" src="https://github.com/user-attachments/assets/d10e37a5-6478-4ebc-9b64-eb84bc3f6ebf" />
 
@@ -29,6 +42,8 @@ APITask é um sistema de gerenciamento de tarefas construído do zero, com foco 
 |----------------|------------------------------------|
 | API            | C# / .NET 10 / ASP.NET Core        |
 | ORM            | Entity Framework Core              |
+| Testes         | xUnit / EF Core InMemory           |
+| Documentação   | OpenAPI / Scalar                   |
 | Banco de dados | Azure SQL Database (SQL Server)    |
 | Hospedagem     | Azure App Service (Web App)        |
 | Automação      | Power Automate                     |
@@ -160,7 +175,7 @@ No appsettings.Development.json (desenvolvimento local):
   }
 }
 ```
-Em produção, a connection string é configurada diretamente nas variáveis de ambiente do Azure App Service - sem expor credenciais no repositório (O nome da connection string deve ser exatamente "DefaultConnection", pois é esse nome que a API busca em tempo de execução)
+Em produção, a connection string é configurada diretamente nas variáveis de ambiente do Azure App Service, sem expor credenciais no repositório (O nome da connection string deve ser exatamente "DefaultConnection", pois é esse nome que a API busca em tempo de execução)
 
 #### Migrations
 Caso não tenha EF CLI instalado:
@@ -175,7 +190,18 @@ dotnet ef database update
 ```bash
 dotnet run
 ```
-A API estará disponível em `https://localhost:7110`, você pode testar os endpoints utilizando Postman ou o arquivo `APITask.http`
+#### Documentação interativa com Scalar
+Em ambiente de desenvolvimento, a documentação interativa da API fica disponível em: 
+```bash
+https://localhost:7110/scalar/v1
+```
+A interface permite visualizar e testar os endpoints da API, você também pode testar os endpoints utilizando Postman ou o arquivo `APITask.http`
+
+#### Executar testes automatizados
+Os testes automatizados estão no projeto `APITask.Tests` e validam a camada de serviço da API sem acessar o banco SQL Server real.
+```bash
+dotnet test
+```
 
 #### Publicar no Azure
 Via Visual Studio:
@@ -186,11 +212,13 @@ Via Visual Studio:
 
 O Visual Studio compila em modo Release e publica automaticamente. As migrations são aplicadas no banco Azure durante o deploy.
 
-## Próximas melhorias
+## Evolução do projeto
 - [x] Service Layer
 - [x] Padronização das respostas da API
-- [ ] Tratamento global de exceções
-- [ ] Testes automatizados
-- [ ] Documentação interativa com Scalar
+- [x] Tratamento global de exceções
+- [x] Testes automatizados
+- [x] Documentação interativa com Scalar
+
+## Próximas melhorias
 - [ ] Autenticação e autorização com JWT ou Entra ID
 - [ ] Logging estruturado
