@@ -29,7 +29,20 @@ Principais melhorias implementadas:
 - Documentação interativa com Scalar em ambiente de desenvolvimento
 
 ### Arquitetura
-<img width="2900" height="230" alt="mermaid-diagram (1)" src="https://github.com/user-attachments/assets/d10e37a5-6478-4ebc-9b64-eb84bc3f6ebf" />
+
+```mermaid
+flowchart LR
+    user["👤 Usuário"]
+    copilot["🤖 Copilot Studio"]
+    power["⚡ Power Automate"]
+    api["🌐 .NET Web API"]
+    db[("🗄️ Azure SQL Database")]
+
+    user <-->|Chat| copilot
+    copilot <-->|Aciona fluxo| power
+    power <-->|HTTP Request| api
+    api <-->|Consulta / Persiste| db
+```
 
 - O usuário interage com o TaskBot no Copilot Studio via chat
 - O Copilot Studio aciona um fluxo no Power Automate conforme o tópico identificado
