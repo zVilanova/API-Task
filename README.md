@@ -45,7 +45,7 @@ Principais melhorias implementadas:
 | Testes         | xUnit / EF Core InMemory           |
 | Documentação   | OpenAPI / Scalar                   |
 | Banco de dados | Azure SQL Database (SQL Server)    |
-| Hospedagem     | Azure App Service (Web App)        |
+| Hospedagem     | Azure App Service                  |
 | Automação      | Power Automate                     |
 | Chatbot        | Copilot Studio                     |
 
