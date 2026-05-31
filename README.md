@@ -162,7 +162,13 @@ O TaskBot é um agente conversacional que permite gerenciar tarefas via chat em 
 #### Clonar o repositório
 ```bash
 git clone https://github.com/zVilanova/API-Task.git
+```
+
+```bash
 cd API-Task/APITask
+```
+
+```bash
 dotnet restore
 ```
 
